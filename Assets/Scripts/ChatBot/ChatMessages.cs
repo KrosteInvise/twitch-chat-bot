@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace ChatBot
 {
-    public class ChatManager
+    public class ChatMessages
     {
         List<string> chatMessages = new();
         const int MAX_MESSAGES = 150;

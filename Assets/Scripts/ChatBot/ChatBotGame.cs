@@ -1,23 +1,21 @@
 using UnityEngine;
 using System.Collections;
 using System.IO;
-using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
 namespace ChatBot
 {
-    public class ChatBotGame : MonoBehaviour, IChatBotGame
+    public class ChatBotGame : MonoBehaviour
     {
         [SerializeField]
         PlayersDataBase playersData;
 
-        public event UnityAction<string> OnMessageSend;
-
         string FilePath => Path.Combine(Application.persistentDataPath, "ChatData.json");
         
-        public void Init()
+        public void Init(ChatEventListener chatEventListener)
         {
             Load();
+            chatEventListener.OnCommandReceived += ProceedCommand;
         }
         
         void OnApplicationQuit()
@@ -25,35 +23,32 @@ namespace ChatBot
             Save();
         }
 
-        public new void SendMessage(string message)
+        void ProceedCommand(string sender, string command)
         {
-            OnMessageSend?.Invoke(message);
-        }
-
-        public void ProceedCommand(string sender, string message)
-        {
-            AddPlayer(sender); 
-
-            /*if (message.StartsWith("!stats"))
+            AddPlayer(sender);
+            
+            /*if (command.StartsWith("stats"))
                 ShowStats(sender);
 
-            if (message.StartsWith("!hp"))
+            if (command.StartsWith("hp"))
                 ShowHp(sender);
 
-            if (message.StartsWith("!runes"))
+            if (command.StartsWith("runes"))
                 ShowMoney(sender);
 
-            if (message.StartsWith("!heal"))
+            if (command.StartsWith("heal"))
                 Heal(sender);
 
-            if (message.StartsWith("!class"))
+            if (command.StartsWith("class"))
                 ShowPlayerClass(sender);
 
-            if (message.StartsWith("!adventure"))
+            if (command.StartsWith("adventure"))
                 StartCoroutine(Adventure(sender));*/
+            
+            Debug.Log(command);
 
-            if (message.StartsWith("!dice"))
-                StartCoroutine(RollDice(sender, message));
+            if (command.StartsWith("dice"))
+                StartCoroutine(RollDice(sender, command));
         }
 
         void AddPlayer(string sender)
@@ -68,7 +63,8 @@ namespace ChatBot
 
         void Save()
         {
-            File.WriteAllText(FilePath,JsonUtility.ToJson(playersData, true)); // Перенести сэйв в отдельную папку в корневой папке проекта, как в MWS было
+            // Перенести сэйв в отдельную папку в корневой папке проекта, как в MWS было
+            File.WriteAllText(FilePath,JsonUtility.ToJson(playersData, true)); 
         }
 
         void Load()
@@ -79,6 +75,7 @@ namespace ChatBot
                 Debug.LogError("Data file doesn't exist!");
         }
 
+        #region КОМАНДЫ РПГ КОТОРЫЕ ПОКА СКРЫТЬ
         //Тут рпг методы всякие
         /*void ShowStats(string sender)
         {
@@ -157,6 +154,8 @@ namespace ChatBot
 
             SendMessage($"{player.twitchName}, вернулся из приключения и принес с собой {earnedGold} деняк.");
         }*/
+        #endregion
+        
 
         IEnumerator RollDice(string sender, string message)
         {
@@ -168,8 +167,7 @@ namespace ChatBot
 
             if (!converted)
             {
-                OnMessageSend?.Invoke($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ");
-                //SendMessage($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ");
+                SendMessage($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ");
                 yield break;
             }
 

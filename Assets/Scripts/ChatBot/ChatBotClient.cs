@@ -1,9 +1,11 @@
+using System;
 using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TwitchLib.Client.Models;
 using TwitchLib.Client.Events;
+using TwitchLib.Client.Extensions;
 using TwitchLib.Communication.Events;
 using TwitchLib.Unity;
 
@@ -12,20 +14,20 @@ namespace ChatBot
     public class ChatBotClient : MonoBehaviour
     {
         [SerializeField]
-        ChatBotConfig config;
-        
-        [SerializeField]
         Button connectButton, disconnectButton;
         
         [SerializeField]
         Text chatText;
-        
+
         Client client;
-        IChatBotGame chatBotGame; 
-        ChatManager chatManager = new();
-        
-        public void Init()
+        ChatEventListener chatEventListener;
+        ChatBotConfig config;
+        ChatMessages chatMessages = new();
+
+        public void Init(ChatBotConfig config, ChatEventListener chatEventListener)
         {
+            this.config = config;
+            this.chatEventListener = chatEventListener;
             connectButton.onClick.AddListener(Connect);
             disconnectButton.onClick.AddListener(Disconnect);
         }
@@ -78,17 +80,28 @@ namespace ChatBot
         
         void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
-            chatManager.AddMessage(e.ChatMessage.Username, e.ChatMessage.Message, chatText);
+            chatMessages.AddMessage(e.ChatMessage.Username, e.ChatMessage.Message, chatText);
         }
+        
         void OnChatCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
             if (e.Command.ChatMessage.Username == config.BotNickname && e.Command.CommandText.StartsWith("r"))
                 SpamCommand(e);
+            
+            if(e.Command.CommandText.Contains("vanish"))
+                Vanish(e);
+            
+            chatEventListener.InvokeOnCommandReceived(e.Command.ChatMessage.Username, e.Command.CommandText);
         }
 
         void OnError(object sender, OnErrorEventArgs e)
         {
             chatText.text += $"Error {e.Exception.Message}\n";
+        }
+
+        void Vanish(OnChatCommandReceivedArgs e)
+        {
+            client.TimeoutUser(e.Command.ChatMessage.Channel,e.Command.ChatMessage.Username,TimeSpan.FromSeconds(1));
         }
 
         void SpamCommand(OnChatCommandReceivedArgs e)
