@@ -1034,14 +1034,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playersData:
-    PlayersDataList:
-    - twitchName: 
-      level: 0
-      gold: 0
-      hp: 0
-      maxHp: 0
-      characterClass: 0
-      inAdventure: 0
+    PlayersDataList: []
 --- !u!114 &1011447776
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -16,11 +16,8 @@ namespace ChatBot
 
         public enum Classes
         {
-            Chatter,
-            Scavenger,
-            Hunter,
-            Assassin,
-        };
+            Chatter
+        }
 
         public PlayerObject(string twitchName)
         {

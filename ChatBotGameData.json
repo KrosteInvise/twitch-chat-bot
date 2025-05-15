@@ -1,0 +1,13 @@
+{
+    "PlayersDataList": [
+        {
+            "twitchName": "kroste_inviser",
+            "level": 1,
+            "gold": 5000.0,
+            "hp": 100,
+            "maxHp": 100,
+            "characterClass": 0,
+            "inAdventure": false
+        }
+    ]
+}

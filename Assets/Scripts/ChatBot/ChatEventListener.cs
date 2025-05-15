@@ -1,11 +1,15 @@
 using UnityEngine.Events;
 
-public sealed class ChatEventListener
+public static class ChatEventListener
 {
-    public UnityAction<string, string> OnCommandReceived;
+    public static UnityAction<string, string> OnCommandReceived;
+    public static UnityAction<string> OnGameRespond;
     
-    public void InvokeOnCommandReceived(string sender, string command)
-    {
+    public static void InvokeOnCommandReceived(string sender, string command) {
         OnCommandReceived?.Invoke(sender, command);
+    }
+    
+    public static void InvokeOnGameRespond(string respond) {
+        OnGameRespond?.Invoke(respond);
     }
 }

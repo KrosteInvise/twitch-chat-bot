@@ -1,11 +1,10 @@
-using System;
 using System.IO;
 using System.Linq;
+using TwitchLib.Api.V5;
 using UnityEngine;
 using UnityEngine.UI;
 using TwitchLib.Client.Models;
 using TwitchLib.Client.Events;
-using TwitchLib.Client.Extensions;
 using TwitchLib.Communication.Events;
 using TwitchLib.Unity;
 
@@ -20,16 +19,15 @@ namespace ChatBot
         Text chatText;
 
         Client client;
-        ChatEventListener chatEventListener;
         ChatBotConfig config;
         ChatMessages chatMessages = new();
 
-        public void Init(ChatBotConfig config, ChatEventListener chatEventListener)
+        public void Init(ChatBotConfig config)
         {
             this.config = config;
-            this.chatEventListener = chatEventListener;
             connectButton.onClick.AddListener(Connect);
             disconnectButton.onClick.AddListener(Disconnect);
+            ChatEventListener.OnGameRespond += SendMessageToChat;
         }
 
         void Connect()
@@ -47,6 +45,7 @@ namespace ChatBot
             client.OnMessageReceived += OnMessageReceived;
             client.OnChatCommandReceived += OnChatCommandReceived;
             client.OnError += OnError;
+            
             client.Connect();
         }
         
@@ -77,7 +76,12 @@ namespace ChatBot
         {
             chatText.text += $"Bot connected to {config.ChannelNickname}\n";
         }
-        
+
+        void SendMessageToChat(string message)
+        {
+            client.SendMessage(config.ChannelNickname, message);
+        }
+
         void OnMessageReceived(object sender, OnMessageReceivedArgs e)
         {
             chatMessages.AddMessage(e.ChatMessage.Username, e.ChatMessage.Message, chatText);
@@ -88,22 +92,14 @@ namespace ChatBot
             if (e.Command.ChatMessage.Username == config.BotNickname && e.Command.CommandText.StartsWith("r"))
                 SpamCommand(e);
             
-            if(e.Command.CommandText.Contains("vanish"))
-                Vanish(e);
-            
-            chatEventListener.InvokeOnCommandReceived(e.Command.ChatMessage.Username, e.Command.CommandText);
+            ChatEventListener.InvokeOnCommandReceived(e.Command.ChatMessage.Username, e.Command.CommandText);
         }
 
         void OnError(object sender, OnErrorEventArgs e)
         {
             chatText.text += $"Error {e.Exception.Message}\n";
         }
-
-        void Vanish(OnChatCommandReceivedArgs e)
-        {
-            client.TimeoutUser(e.Command.ChatMessage.Channel,e.Command.ChatMessage.Username,TimeSpan.FromSeconds(1));
-        }
-
+        
         void SpamCommand(OnChatCommandReceivedArgs e)
         {
             var arguments = e.Command.ArgumentsAsList;
@@ -124,7 +120,7 @@ namespace ChatBot
 
             if (repeatCount > 10)
             {
-                client.SendMessage(e.Command.ChatMessage.Channel, "Too much iterations (> 10)");
+                client.SendMessage(e.Command.ChatMessage.Channel, "Слишком много итераций (> 10)");
                 return;
             }
             

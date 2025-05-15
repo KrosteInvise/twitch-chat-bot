@@ -13,12 +13,10 @@ namespace ChatBot
         [SerializeField]
         ChatBotGame chatBotGame;
         
-        ChatEventListener chatEventListener = new();
-        
         void Awake()
         {
-            chatBotClient.Init(config, chatEventListener);
-            chatBotGame.Init(chatEventListener);
+            chatBotClient.Init(config);
+            chatBotGame.Init();
         }
     }
 }

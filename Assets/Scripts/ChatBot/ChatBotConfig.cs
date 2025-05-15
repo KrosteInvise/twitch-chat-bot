@@ -5,16 +5,13 @@ namespace ChatBot
 	public class ChatBotConfig : ScriptableObject
 	{
 		[SerializeField]
-		string botNickname;
-
+		string channelNickname;
+		
 		[SerializeField]
 		string passwordFile;
 
-		[SerializeField]
-		string channelNickname;
-
-		public string BotNickname     => botNickname;
-		public string PasswordFile    => passwordFile;
 		public string ChannelNickname => channelNickname;
+		public string PasswordFile    => passwordFile;
+		public string BotNickname => "kroste_inviser";
 	}
 }

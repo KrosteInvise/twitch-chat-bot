@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using System.IO;
 using Random = UnityEngine.Random;
 
 namespace ChatBot
@@ -10,22 +9,29 @@ namespace ChatBot
         [SerializeField]
         PlayersDataBase playersData;
 
-        string FilePath => Path.Combine(Application.persistentDataPath, "ChatData.json");
-        
-        public void Init(ChatEventListener chatEventListener)
+        public void Init()
         {
-            Load();
-            chatEventListener.OnCommandReceived += ProceedCommand;
+            playersData = ChatBotGameData.Load();
+            ChatEventListener.OnCommandReceived += ProceedCommand;
         }
         
         void OnApplicationQuit()
         {
-            Save();
+            ChatBotGameData.Save(playersData);
         }
 
         void ProceedCommand(string sender, string command)
         {
             AddPlayer(sender);
+            
+            if (command.StartsWith("dice"))
+                StartCoroutine(RollDice(sender, command));
+            
+            if(command.StartsWith("money"))
+                ShowMoney(sender);
+            
+            if (command.StartsWith("ping"))
+                ChatEventListener.InvokeOnGameRespond("pong");
             
             /*if (command.StartsWith("stats"))
                 ShowStats(sender);
@@ -44,11 +50,6 @@ namespace ChatBot
 
             if (command.StartsWith("adventure"))
                 StartCoroutine(Adventure(sender));*/
-            
-            Debug.Log(command);
-
-            if (command.StartsWith("dice"))
-                StartCoroutine(RollDice(sender, command));
         }
 
         void AddPlayer(string sender)
@@ -58,37 +59,22 @@ namespace ChatBot
             if (!playersData.PlayersDataList.Exists(x => x.twitchName == player.twitchName))
                 playersData.PlayersDataList.Add(player);
 
-            Save();
+            ChatBotGameData.Save(playersData);
         }
-
-        void Save()
-        {
-            // Перенести сэйв в отдельную папку в корневой папке проекта, как в MWS было
-            File.WriteAllText(FilePath,JsonUtility.ToJson(playersData, true)); 
-        }
-
-        void Load()
-        {
-            if (File.Exists(FilePath))
-                playersData = JsonUtility.FromJson<PlayersDataBase>(File.ReadAllText(FilePath));
-            else
-                Debug.LogError("Data file doesn't exist!");
-        }
-
-        #region КОМАНДЫ РПГ КОТОРЫЕ ПОКА СКРЫТЬ
+        
         //Тут рпг методы всякие
-        /*void ShowStats(string sender)
+        void ShowStats(string sender)
         {
             var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
             if (player != null)
-                SendMessage($"{player.twitchName} stats. Level: {player.level}. Gold: {player.gold}");
+                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}: Уровень: {player.level}. Деняк: {player.gold}");
         }
 
         void ShowMoney(string sender)
         {
             var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
             if (player != null)
-                SendMessage($"{player.twitchName} have: {player.gold} gold.");
+                ChatEventListener.InvokeOnGameRespond($"У {player.twitchName}: {player.gold} деняк.");
         }
 
         void ShowHp(string sender)
@@ -97,11 +83,11 @@ namespace ChatBot
             if (player != null)
             {
                 if (player.hp > 1)
-                    SendMessage($"{player.twitchName} hp: {player.hp}/{player.maxHp}. Status: Alive");
+                    ChatEventListener.InvokeOnGameRespond($"{player.twitchName} хп: {player.hp}/{player.maxHp}. Статус: Здоров");
                 else if (player.hp <= 1)
                 {
                     player.hp = 1;
-                    SendMessage($"{player.twitchName} hp: {player.hp}/{player.maxHp}. Status: Exhausted");
+                    ChatEventListener.InvokeOnGameRespond($"{player.twitchName} хп: {player.hp}/{player.maxHp}. Статус: Вымотан");
                 }
             }
         }
@@ -114,12 +100,12 @@ namespace ChatBot
             {
                 player.gold -= cost;
                 player.hp = player.maxHp;
-                SendMessage($"{player.twitchName} take a good rest and pay for this {cost} gold!");
+                ChatEventListener.InvokeOnGameRespond($"{player.twitchName} хорошо отдохнул и заплатил {cost} деняк!");
             }
             else if (player.hp == player.maxHp)
-                SendMessage($"{player.twitchName}, ты полностью здоров!");
+                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, ты полностью здоров!");
             else if (player.gold < cost)
-                SendMessage($"{player.twitchName}, недостаточно деняк!");
+                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, недостаточно деняк!");
 
         }
 
@@ -127,7 +113,7 @@ namespace ChatBot
         {
             var index = playersData.PlayersDataList.Find(x => x.twitchName == sender);
             SendMessage($"{index.twitchName}, ваш класс: {index.characterClass}");
-        }*/
+        }
 
         //тестовое отправлялово в "приключения"
         /*IEnumerator Adventure(string sender)
@@ -154,7 +140,6 @@ namespace ChatBot
 
             SendMessage($"{player.twitchName}, вернулся из приключения и принес с собой {earnedGold} деняк.");
         }*/
-        #endregion
         
 
         IEnumerator RollDice(string sender, string message)
@@ -162,39 +147,39 @@ namespace ChatBot
             var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
             var userRoll = Random.Range(1, 13);
             var botRoll = Random.Range(1, 13);
-            var stake = message.Remove(0, 6);
+            var stake = message.Remove(0,  5);
             var converted = int.TryParse(stake, out int finalStake);
 
             if (!converted)
             {
-                SendMessage($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ");
+                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ");
                 yield break;
             }
 
             if (finalStake <= player.gold)
             {
-                SendMessage($"{player.twitchName} сделал ставку, ждём результат EZ");
+                ChatEventListener.InvokeOnGameRespond($"{player.twitchName} сделал ставку, ждём результат EZ");
                 player.gold -= finalStake;
-                yield return new WaitForSeconds(4f);
+                yield return new WaitForSeconds(3f);
 
                 if (userRoll > botRoll)
                 {
-                    SendMessage($"Казино: {botRoll}. {player.twitchName}: {userRoll} Поздравляю EZ");
+                    ChatEventListener.InvokeOnGameRespond($"Казино: {botRoll}. {player.twitchName}: {userRoll} Поздравляю EZ");
                     player.gold += finalStake * 2;
                 }
                 else if (userRoll == botRoll)
                 {
-                    SendMessage($"Казино: {botRoll}. {player.twitchName}: {userRoll} Ничья Pog");
+                    ChatEventListener.InvokeOnGameRespond($"Казино: {botRoll}. {player.twitchName}: {userRoll} Ничья Pog");
                     player.gold += finalStake;
                 }
                 else
                 {
-                    SendMessage($"Казино: {botRoll}. {player.twitchName}: {userRoll} Казино побеждает YviBusiness");
+                    ChatEventListener.InvokeOnGameRespond($"Казино: {botRoll}. {player.twitchName}: {userRoll} Казино побеждает YviBusiness");
                 }
             }
             else
             {
-                SendMessage($"{player.twitchName}, сэр, бабло чекните (!money)");
+                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, сэр, бабло чекните (!money)");
             }
         }
     }
