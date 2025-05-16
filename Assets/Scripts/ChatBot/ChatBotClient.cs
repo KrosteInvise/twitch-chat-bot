@@ -108,19 +108,19 @@ namespace ChatBot
 
             if (arguments.Count < 2)
             {
-                client.SendMessage(e.Command.ChatMessage.Channel,$"{e.Command.ChatMessage.Username}, насрал в аргументы");
+                client.SendMessage(e.Command.ChatMessage.Channel,$"{e.Command.ChatMessage.Username}, args less than 2.");
                 return;
             }
 
             if (!int.TryParse(iterations, out int repeatCount) || repeatCount <= 0)
             {
-                client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ChatMessage.Username}, насрал в число");
+                client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ChatMessage.Username}, can't parse the args as an integer.");
                 return;
             }
 
             if (repeatCount > 10)
             {
-                client.SendMessage(e.Command.ChatMessage.Channel, "Слишком много итераций (> 10)");
+                client.SendMessage(e.Command.ChatMessage.Channel, "Too many iterations.");
                 return;
             }
             

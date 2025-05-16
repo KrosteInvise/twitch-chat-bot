@@ -10,6 +10,8 @@
 /[Cc]IBuilds/
 /[Ll]ogs/
 /[Mm]emoryCaptures/
+password.txt
+ChatBotGameData.json
 
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta

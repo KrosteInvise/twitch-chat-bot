@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00315e000dd3ac74c8eced5f37f12992, type: 3}
   m_Name: BotConfig
   m_EditorClassIdentifier: 
-  channelNickname: kroste_inviser
+  channelNickname: 
   passwordFile: password.txt

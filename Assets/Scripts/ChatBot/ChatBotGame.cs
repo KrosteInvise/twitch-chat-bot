@@ -1,6 +1,5 @@
+using ChatBotGames;
 using UnityEngine;
-using System.Collections;
-using Random = UnityEngine.Random;
 
 namespace ChatBot
 {
@@ -23,9 +22,9 @@ namespace ChatBot
         void ProceedCommand(string sender, string command)
         {
             AddPlayer(sender);
-            
+
             if (command.StartsWith("dice"))
-                StartCoroutine(RollDice(sender, command));
+                StartCoroutine(new RollDiceGame().RollDice(sender, message: command, playersData));
             
             if(command.StartsWith("money"))
                 ShowMoney(sender);
@@ -61,25 +60,31 @@ namespace ChatBot
 
             ChatBotGameData.Save(playersData);
         }
-        
+
+        PlayerObject GetPlayer(string sender)
+        {
+            var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
+            return player;
+        }
+
         //Тут рпг методы всякие
         void ShowStats(string sender)
         {
-            var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
+            var player = GetPlayer(sender);
             if (player != null)
                 ChatEventListener.InvokeOnGameRespond($"{player.twitchName}: Уровень: {player.level}. Деняк: {player.gold}");
         }
 
         void ShowMoney(string sender)
         {
-            var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
+            var player = GetPlayer(sender);
             if (player != null)
                 ChatEventListener.InvokeOnGameRespond($"У {player.twitchName}: {player.gold} деняк.");
         }
 
         void ShowHp(string sender)
         {
-            var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
+            var player = GetPlayer(sender);
             if (player != null)
             {
                 if (player.hp > 1)
@@ -94,7 +99,7 @@ namespace ChatBot
 
         void Heal(string sender)
         {
-            var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
+            var player = GetPlayer(sender);
             int cost = (player.maxHp - player.hp) * player.level;
             if (player.hp < player.maxHp && player.gold > cost)
             {
@@ -111,8 +116,8 @@ namespace ChatBot
 
         void ShowPlayerClass(string sender)
         {
-            var index = playersData.PlayersDataList.Find(x => x.twitchName == sender);
-            SendMessage($"{index.twitchName}, ваш класс: {index.characterClass}");
+            var player = GetPlayer(sender);
+            SendMessage($"{player.twitchName}, ваш класс: {player.characterClass}");
         }
 
         //тестовое отправлялово в "приключения"
@@ -141,46 +146,5 @@ namespace ChatBot
             SendMessage($"{player.twitchName}, вернулся из приключения и принес с собой {earnedGold} деняк.");
         }*/
         
-
-        IEnumerator RollDice(string sender, string message)
-        {
-            var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
-            var userRoll = Random.Range(1, 13);
-            var botRoll = Random.Range(1, 13);
-            var stake = message.Remove(0,  5);
-            var converted = int.TryParse(stake, out int finalStake);
-
-            if (!converted)
-            {
-                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ");
-                yield break;
-            }
-
-            if (finalStake <= player.gold)
-            {
-                ChatEventListener.InvokeOnGameRespond($"{player.twitchName} сделал ставку, ждём результат EZ");
-                player.gold -= finalStake;
-                yield return new WaitForSeconds(3f);
-
-                if (userRoll > botRoll)
-                {
-                    ChatEventListener.InvokeOnGameRespond($"Казино: {botRoll}. {player.twitchName}: {userRoll} Поздравляю EZ");
-                    player.gold += finalStake * 2;
-                }
-                else if (userRoll == botRoll)
-                {
-                    ChatEventListener.InvokeOnGameRespond($"Казино: {botRoll}. {player.twitchName}: {userRoll} Ничья Pog");
-                    player.gold += finalStake;
-                }
-                else
-                {
-                    ChatEventListener.InvokeOnGameRespond($"Казино: {botRoll}. {player.twitchName}: {userRoll} Казино побеждает YviBusiness");
-                }
-            }
-            else
-            {
-                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, сэр, бабло чекните (!money)");
-            }
-        }
     }
 }
