@@ -32,6 +32,7 @@ namespace ChatBot
             if (command.StartsWith("ping"))
                 ChatEventListener.InvokeOnGameRespond("pong");
             
+            //Obsolete
             /*if (command.StartsWith("stats"))
                 ShowStats(sender);
 

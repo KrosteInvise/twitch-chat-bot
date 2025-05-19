@@ -10,8 +10,12 @@
 /[Cc]IBuilds/
 /[Ll]ogs/
 /[Mm]emoryCaptures/
+
+#Custom ingores
 password.txt
 ChatBotGameData.json
+/[Aa]ssets/Resources/BotConfig.asset
+/[Aa]ssets/Resources/BotConfig.asset.meta
 
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
