@@ -24,7 +24,6 @@ namespace ChatBot
     
         public static void Save(PlayersDataBase playersData)
         {
-            // Перенести сэйв в отдельную папку в корневой папке проекта, как в MWS было
             File.WriteAllText(fullPath,JsonUtility.ToJson(playersData, true)); 
         }
     }

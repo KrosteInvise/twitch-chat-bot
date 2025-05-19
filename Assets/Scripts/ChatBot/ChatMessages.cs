@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using System.Drawing;
+using TMPro;
+using TwitchLib.Client.Events;
 using UnityEngine.UI;
 
 namespace ChatBot
@@ -8,9 +11,14 @@ namespace ChatBot
         List<string> chatMessages = new();
         const int MAX_MESSAGES = 150;
         
-        public void AddMessage(string sender, string message, Text chatText)
+        public void AddMessage(OnMessageReceivedArgs args, TextMeshProUGUI chatText)
         {
-            chatMessages.Add($"{sender}: {message}");
+            string color = args.ChatMessage.ColorHex;
+            
+            if (color == "")
+                color = "#FFFFFF";
+            
+            chatMessages.Add($"<{color}>{args.ChatMessage.Username}</color>: {args.ChatMessage.Message}");
             if (chatMessages.Count > MAX_MESSAGES)
                 chatMessages.RemoveAt(0);
 

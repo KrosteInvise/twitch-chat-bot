@@ -1,20 +1,20 @@
 using System.Collections;
-using ChatBot;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-namespace ChatBotGames
+namespace ChatBot
 {
     public class RollDiceGame
     {
-        public IEnumerator RollDice(string sender, string message, PlayersDataBase playersData)
+        public IEnumerator RollDice(string sender, PlayersDataBase playersData, List<string> args)
         {
-            var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
+            PlayerObject player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
+            string stake = args.FirstOrDefault();
             var userRoll = Random.Range(1, 13);
             var botRoll = Random.Range(1, 13);
-            var stake = message.Remove(0,  5);
-            var converted = int.TryParse(stake, out int finalStake);
 
-            if (!converted)
+            if (!int.TryParse(stake, out int finalStake))
             {
                 ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ");
                 yield break;
@@ -22,28 +22,26 @@ namespace ChatBotGames
 
             if (finalStake <= player.gold)
             {
-                ChatEventListener.InvokeOnGameRespond($"{player.twitchName} сделал ставку, ждём результат EZ");
                 player.gold -= finalStake;
-                yield return new WaitForSeconds(3f);
 
                 if (userRoll > botRoll)
                 {
-                    ChatEventListener.InvokeOnGameRespond($"Казино: {botRoll}. {player.twitchName}: {userRoll} Поздравляю EZ");
+                    ChatEventListener.InvokeOnGameRespond($"baseg : {botRoll}. {player.twitchName}: {userRoll}. Поздравляю EZ");
                     player.gold += finalStake * 2;
                 }
                 else if (userRoll == botRoll)
                 {
-                    ChatEventListener.InvokeOnGameRespond($"Казино: {botRoll}. {player.twitchName}: {userRoll} Ничья Pog");
+                    ChatEventListener.InvokeOnGameRespond($"baseg : {botRoll}. {player.twitchName}: {userRoll}. Да клянись, ничья!");
                     player.gold += finalStake;
                 }
                 else
                 {
-                    ChatEventListener.InvokeOnGameRespond($"Казино: {botRoll}. {player.twitchName}: {userRoll} Казино побеждает YviBusiness");
+                    ChatEventListener.InvokeOnGameRespond($"baseg : {botRoll}. {player.twitchName}: {userRoll}. baseg побеждает YviBusiness");
                 }
             }
             else
             {
-                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, сэр, бабло чекните (!money)");
+                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, не хватает деняк (!money)");
             }
         }
     }

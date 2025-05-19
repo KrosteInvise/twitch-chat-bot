@@ -1,5 +1,5 @@
-using ChatBotGames;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace ChatBot
 {
@@ -19,12 +19,12 @@ namespace ChatBot
             ChatBotGameData.Save(playersData);
         }
 
-        void ProceedCommand(string sender, string command)
+        void ProceedCommand(string sender, string command, List<string> args)
         {
             AddPlayer(sender);
 
             if (command.StartsWith("dice"))
-                StartCoroutine(new RollDiceGame().RollDice(sender, message: command, playersData));
+                StartCoroutine(new RollDiceGame().RollDice(sender, playersData, args));
             
             if(command.StartsWith("money"))
                 ShowMoney(sender);
@@ -66,20 +66,20 @@ namespace ChatBot
             var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
             return player;
         }
-
-        //Тут рпг методы всякие
-        void ShowStats(string sender)
-        {
-            var player = GetPlayer(sender);
-            if (player != null)
-                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}: Уровень: {player.level}. Деняк: {player.gold}");
-        }
-
+        
         void ShowMoney(string sender)
         {
             var player = GetPlayer(sender);
             if (player != null)
                 ChatEventListener.InvokeOnGameRespond($"У {player.twitchName}: {player.gold} деняк.");
+        }
+        
+        //Obsolete
+        /*void ShowStats(string sender)
+        {
+            var player = GetPlayer(sender);
+            if (player != null)
+                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}: Уровень: {player.level}. Деняк: {player.gold}");
         }
 
         void ShowHp(string sender)
@@ -119,9 +119,8 @@ namespace ChatBot
             var player = GetPlayer(sender);
             SendMessage($"{player.twitchName}, ваш класс: {player.characterClass}");
         }
-
-        //тестовое отправлялово в "приключения"
-        /*IEnumerator Adventure(string sender)
+        
+        IEnumerator Adventure(string sender)
         {
             var player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
             var adventureTime = Random.Range(450, 600);
@@ -145,6 +144,5 @@ namespace ChatBot
 
             SendMessage($"{player.twitchName}, вернулся из приключения и принес с собой {earnedGold} деняк.");
         }*/
-        
     }
 }

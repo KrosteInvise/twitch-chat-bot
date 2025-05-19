@@ -1,10 +1,12 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using TwitchLib.Api.V5;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using TwitchLib.Client.Models;
 using TwitchLib.Client.Events;
+using TwitchLib.Client.Models.Common;
 using TwitchLib.Communication.Events;
 using TwitchLib.Unity;
 
@@ -13,10 +15,13 @@ namespace ChatBot
     public class ChatBotClient : MonoBehaviour
     {
         [SerializeField]
-        Button connectButton, disconnectButton;
+        Button connectButton, disconnectButton, repeatButton;
         
         [SerializeField]
-        Text chatText;
+        TextMeshProUGUI chatText;
+        
+        [SerializeField]
+        TMP_InputField repeatTextInputField;
 
         Client client;
         ChatBotConfig config;
@@ -27,6 +32,7 @@ namespace ChatBot
             this.config = config;
             connectButton.onClick.AddListener(Connect);
             disconnectButton.onClick.AddListener(Disconnect);
+            repeatButton.onClick.AddListener(SpamCommand);
             ChatEventListener.OnGameRespond += SendMessageToChat;
         }
 
@@ -60,19 +66,19 @@ namespace ChatBot
             client.OnError -= OnError;
         }
         
-        void OnConnected(object sender, OnConnectedArgs e)
+        void OnConnected(object sender, OnConnectedArgs args)
         {
             client.JoinChannel(config.ChannelNickname);
             chatText.text += "Bot connected to client\n";
         }
         
-        void OnDisconnected(object sender, OnDisconnectedEventArgs e)
+        void OnDisconnected(object sender, OnDisconnectedEventArgs args)
         {
             client.LeaveChannel(config.ChannelNickname);
             chatText.text += $"Bot disconnected from {config.ChannelNickname}\n";
         }
         
-        void OnJoinedChannel(object sender, OnJoinedChannelArgs e)
+        void OnJoinedChannel(object sender, OnJoinedChannelArgs args)
         {
             chatText.text += $"Bot connected to {config.ChannelNickname}\n";
         }
@@ -82,50 +88,35 @@ namespace ChatBot
             client.SendMessage(config.ChannelNickname, message);
         }
 
-        void OnMessageReceived(object sender, OnMessageReceivedArgs e)
+        void OnMessageReceived(object sender, OnMessageReceivedArgs args)
         {
-            chatMessages.AddMessage(e.ChatMessage.Username, e.ChatMessage.Message, chatText);
+            chatMessages.AddMessage(args, chatText);
         }
         
-        void OnChatCommandReceived(object sender, OnChatCommandReceivedArgs e)
+        void OnChatCommandReceived(object sender, OnChatCommandReceivedArgs args)
         {
-            if (e.Command.ChatMessage.Username == config.BotNickname && e.Command.CommandText.StartsWith("r"))
-                SpamCommand(e);
-            
-            ChatEventListener.InvokeOnCommandReceived(e.Command.ChatMessage.Username, e.Command.CommandText);
+            ChatEventListener.InvokeOnCommandReceived(args.Command.ChatMessage.Username, args.Command.CommandText, args.Command.ArgumentsAsList);
         }
 
-        void OnError(object sender, OnErrorEventArgs e)
+        void OnError(object sender, OnErrorEventArgs args)
         {
-            chatText.text += $"Error {e.Exception.Message}\n";
+            chatText.text += $"<color=\"red\">Error {args.Exception.Message}</color>\n";
         }
         
-        void SpamCommand(OnChatCommandReceivedArgs e)
+        void SpamCommand()
         {
-            var arguments = e.Command.ArgumentsAsList;
+            List<string> arguments = Helpers.ParseQuotesAndNonQuotes(repeatTextInputField.text);
             string iterations = arguments.First();
             string message = arguments.ElementAtOrDefault(1);
 
-            if (arguments.Count < 2)
+            if (arguments.Count != 2 || !int.TryParse(iterations, out int repeatCount) || repeatCount <= 0 || repeatCount > 8)
             {
-                client.SendMessage(e.Command.ChatMessage.Channel,$"{e.Command.ChatMessage.Username}, args less than 2.");
-                return;
-            }
-
-            if (!int.TryParse(iterations, out int repeatCount) || repeatCount <= 0)
-            {
-                client.SendMessage(e.Command.ChatMessage.Channel, $"{e.Command.ChatMessage.Username}, can't parse the args as an integer.");
-                return;
-            }
-
-            if (repeatCount > 10)
-            {
-                client.SendMessage(e.Command.ChatMessage.Channel, "Too many iterations.");
+                Debug.LogError("<color=\"red\">Something went wrong when trying to spam");
                 return;
             }
             
             for (int i = 0; i < repeatCount; i++)
-                client.SendMessage(e.Command.ChatMessage.Channel, message);
+                client.SendMessage(config.ChannelNickname, message);
         }
     }
 }
