@@ -14,8 +14,6 @@
 #Custom ingores
 password.txt
 ChatBotGameData.json
-/[Aa]ssets/Resources/BotConfig.asset
-/[Aa]ssets/Resources/BotConfig.asset.meta
 
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
@@ -76,14 +74,6 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 LocalizationWorkflow/
-
-# Ключница и пароли для подписи билда
-OtherFiles/ForAutoBuild/keystorePass.txt
-OtherFiles/ForAutoBuild/user.keystore
-ForAutoBuild/keystorePass.txt
-
-[Aa]ssets/Editor/RemoteConfig/Data/RemoteConfigDataStoreAsset.asset
-[Aa]ssets/Editor/RemoteConfig/Data/RemoteConfigDataStoreAsset.asset.meta
 
 # According to latest manual
 # https://docs.unity3d.com/2022.2/Documentation/Manual/ExternalVersionControlSystemSupport.html
