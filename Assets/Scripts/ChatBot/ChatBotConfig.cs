@@ -6,12 +6,12 @@ namespace ChatBot
 	{
 		[SerializeField]
 		string channelNickname;
-		
+
 		[SerializeField]
-		string passwordFile;
+		string botName;
 
 		public string ChannelNickname => channelNickname;
-		public string PasswordFile    => passwordFile;
-		public string BotNickname => "kroste_inviser";
+
+		public string BotName => botName;
 	}
 }

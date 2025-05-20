@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ChatBot;
 using UnityEngine;
 
-namespace ChatBot
+namespace ChatBotCommands
 {
     public class RollDiceGame
     {

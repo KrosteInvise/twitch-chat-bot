@@ -1,12 +1,9 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using ChatBotCommands;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using TwitchLib.Client.Models;
 using TwitchLib.Client.Events;
-using TwitchLib.Client.Models.Common;
 using TwitchLib.Communication.Events;
 using TwitchLib.Unity;
 
@@ -32,14 +29,14 @@ namespace ChatBot
             this.config = config;
             connectButton.onClick.AddListener(Connect);
             disconnectButton.onClick.AddListener(Disconnect);
-            repeatButton.onClick.AddListener(SpamCommand);
+            repeatButton.onClick.AddListener(() => new Repeat().RepeatExecute(client, config, repeatTextInputField));
             ChatEventListener.OnGameRespond += SendMessageToChat;
         }
 
         void Connect()
         {
             Application.runInBackground = true;
-            ConnectionCredentials credentials = new ConnectionCredentials(config.BotNickname.ToLower(), File.ReadAllText(config.PasswordFile));
+            ConnectionCredentials credentials = new ConnectionCredentials(config.BotName.ToLower(), Secrets.bot_access_token);
             client = new Client();
             client.Initialize(credentials, config.ChannelNickname);
             
@@ -48,6 +45,7 @@ namespace ChatBot
             client.OnConnected += OnConnected;
             client.OnDisconnected += OnDisconnected;
             client.OnJoinedChannel += OnJoinedChannel;
+            client.OnLeftChannel += OnLeftChannel;
             client.OnMessageReceived += OnMessageReceived;
             client.OnChatCommandReceived += OnChatCommandReceived;
             client.OnError += OnError;
@@ -58,9 +56,10 @@ namespace ChatBot
         void Disconnect()
         {
             client.Disconnect();
-            client.OnConnected     -= OnConnected;
+            client.OnConnected  -= OnConnected;
             client.OnDisconnected -= OnDisconnected;
             client.OnJoinedChannel -= OnJoinedChannel;
+            client.OnLeftChannel -= OnLeftChannel;
             client.OnMessageReceived -= OnMessageReceived;
             client.OnChatCommandReceived -= OnChatCommandReceived;
             client.OnError -= OnError;
@@ -82,6 +81,11 @@ namespace ChatBot
         {
             chatText.text += $"Bot connected to {config.ChannelNickname}\n";
         }
+        
+        void OnLeftChannel(object sender, OnLeftChannelArgs args)
+        {
+            chatText.text += $"Bot left {config.ChannelNickname} channel\n";
+        }
 
         void SendMessageToChat(string message)
         {
@@ -100,23 +104,7 @@ namespace ChatBot
 
         void OnError(object sender, OnErrorEventArgs args)
         {
-            chatText.text += $"<color=\"red\">Error {args.Exception.Message}</color>\n";
-        }
-        
-        void SpamCommand()
-        {
-            List<string> arguments = Helpers.ParseQuotesAndNonQuotes(repeatTextInputField.text);
-            string iterations = arguments.First();
-            string message = arguments.ElementAtOrDefault(1);
-
-            if (arguments.Count != 2 || !int.TryParse(iterations, out int repeatCount) || repeatCount <= 0 || repeatCount > 8)
-            {
-                Debug.LogError("<color=\"red\">Something went wrong when trying to spam");
-                return;
-            }
-            
-            for (int i = 0; i < repeatCount; i++)
-                client.SendMessage(config.ChannelNickname, message);
+            chatText.text += $"Error {args.Exception.Message}</color>\n";
         }
     }
 }

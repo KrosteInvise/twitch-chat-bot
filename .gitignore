@@ -11,10 +11,6 @@
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 
-#Custom ingores
-password.txt
-ChatBotGameData.json
-
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
 
