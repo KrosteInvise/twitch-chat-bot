@@ -11,7 +11,6 @@ namespace ChatBot
         public int level;
         public int hp;
         public int maxHp;
-        //public bool inAdventure;
 
         public PlayerObject(string twitchName)
         {
@@ -20,7 +19,6 @@ namespace ChatBot
             level = 1;
             hp = 100;
             maxHp = 100;
-            //inAdventure = false;
         }
     }
 

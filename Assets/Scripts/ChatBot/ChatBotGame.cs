@@ -12,7 +12,7 @@ namespace ChatBot
         public void Init()
         {
             playersData = ChatBotGameData.Load();
-            ChatEventListener.OnCommandReceived += ProceedCommand;
+            ChatEventMediator.OnCommandReceived += ProceedCommand;
         }
         
         void OnApplicationQuit()
@@ -51,7 +51,7 @@ namespace ChatBot
         {
             var player = GetPlayer(sender);
             if (player != null)
-                ChatEventListener.InvokeOnGameRespond($"У {player.twitchName}: {player.gold} деняк.");
+                ChatEventMediator.InvokeRespond($"У {player.twitchName}: {player.gold} деняк.");
         }
     }
 }

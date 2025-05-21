@@ -17,7 +17,7 @@ namespace ChatBotCommands
 
             if (!int.TryParse(stake, out int finalStake))
             {
-                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ");
+                ChatEventMediator.InvokeRespond($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ");
                 yield break;
             }
 
@@ -27,22 +27,22 @@ namespace ChatBotCommands
 
                 if (userRoll > botRoll)
                 {
-                    ChatEventListener.InvokeOnGameRespond($"baseg : {botRoll}. {player.twitchName}: {userRoll}. Поздравляю EZ");
+                    ChatEventMediator.InvokeRespond($"baseg : {botRoll}. {player.twitchName}: {userRoll}. Поздравляю EZ");
                     player.gold += finalStake * 2;
                 }
                 else if (userRoll == botRoll)
                 {
-                    ChatEventListener.InvokeOnGameRespond($"baseg : {botRoll}. {player.twitchName}: {userRoll}. Да клянись, ничья!");
+                    ChatEventMediator.InvokeRespond($"baseg : {botRoll}. {player.twitchName}: {userRoll}. Да клянись, ничья!");
                     player.gold += finalStake;
                 }
                 else
                 {
-                    ChatEventListener.InvokeOnGameRespond($"baseg : {botRoll}. {player.twitchName}: {userRoll}. baseg побеждает YviBusiness");
+                    ChatEventMediator.InvokeRespond($"baseg : {botRoll}. {player.twitchName}: {userRoll}. baseg побеждает YviBusiness");
                 }
             }
             else
             {
-                ChatEventListener.InvokeOnGameRespond($"{player.twitchName}, не хватает деняк (!money)");
+                ChatEventMediator.InvokeRespond($"{player.twitchName}, не хватает деняк (!money)");
             }
         }
     }

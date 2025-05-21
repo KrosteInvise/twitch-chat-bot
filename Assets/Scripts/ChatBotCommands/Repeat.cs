@@ -10,7 +10,7 @@ namespace ChatBotCommands
 {
     public class Repeat
     {
-        public void RepeatExecute(TwitchClient client, ChatBotConfig config, TMP_InputField repeatTextInputField)
+        public void RepeatExecute(TMP_InputField repeatTextInputField)
         {
             List<string> arguments = Helpers.ParseQuotesAndNonQuotes(repeatTextInputField.text);
             string iterations = arguments.First();
@@ -23,7 +23,7 @@ namespace ChatBotCommands
             }
             
             for (int i = 0; i < repeatCount; i++)
-                client.SendMessage(config.ChannelNickname, message);
+                ChatEventMediator.InvokeRespond($"{message}");
         }
     }
 }

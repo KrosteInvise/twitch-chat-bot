@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Drawing;
 using TMPro;
 using TwitchLib.Client.Events;
-using UnityEngine.UI;
 
 namespace ChatBot
 {

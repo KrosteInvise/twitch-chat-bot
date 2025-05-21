@@ -1,11 +1,13 @@
-using ChatBotCommands;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using TwitchLib.Client.Models;
 using TwitchLib.Client.Events;
+using TwitchLib.Client.Extensions;
 using TwitchLib.Communication.Events;
 using TwitchLib.Unity;
+using UnityEngine.UI;
+using Button = UnityEngine.UI.Button;
+using Repeat = ChatBotCommands.Repeat;
 
 namespace ChatBot
 {
@@ -19,6 +21,9 @@ namespace ChatBot
         
         [SerializeField]
         TMP_InputField repeatTextInputField;
+        
+        [SerializeField]
+        ScrollRect chatScrollView;
 
         Client client;
         ChatBotConfig config;
@@ -29,11 +34,11 @@ namespace ChatBot
             this.config = config;
             connectButton.onClick.AddListener(Connect);
             disconnectButton.onClick.AddListener(Disconnect);
-            repeatButton.onClick.AddListener(() => new Repeat().RepeatExecute(client, config, repeatTextInputField));
-            ChatEventListener.OnGameRespond += SendMessageToChat;
+            repeatButton.onClick.AddListener(() => new Repeat().RepeatExecute(repeatTextInputField));
+            ChatEventMediator.OnRespond += SendMessageToChat;
         }
 
-        void Connect()
+        public void Connect()
         {
             Application.runInBackground = true;
             ConnectionCredentials credentials = new ConnectionCredentials(config.BotName.ToLower(), Secrets.bot_access_token);
@@ -43,7 +48,6 @@ namespace ChatBot
             chatText.text += "Connecting...\n";
             
             client.OnConnected += OnConnected;
-            client.OnDisconnected += OnDisconnected;
             client.OnJoinedChannel += OnJoinedChannel;
             client.OnLeftChannel += OnLeftChannel;
             client.OnMessageReceived += OnMessageReceived;
@@ -53,11 +57,10 @@ namespace ChatBot
             client.Connect();
         }
         
-        void Disconnect()
+        public void Disconnect()
         {
             client.Disconnect();
             client.OnConnected  -= OnConnected;
-            client.OnDisconnected -= OnDisconnected;
             client.OnJoinedChannel -= OnJoinedChannel;
             client.OnLeftChannel -= OnLeftChannel;
             client.OnMessageReceived -= OnMessageReceived;
@@ -69,12 +72,6 @@ namespace ChatBot
         {
             client.JoinChannel(config.ChannelNickname);
             chatText.text += "Bot connected to client\n";
-        }
-        
-        void OnDisconnected(object sender, OnDisconnectedEventArgs args)
-        {
-            client.LeaveChannel(config.ChannelNickname);
-            chatText.text += $"Bot disconnected from {config.ChannelNickname}\n";
         }
         
         void OnJoinedChannel(object sender, OnJoinedChannelArgs args)
@@ -95,11 +92,13 @@ namespace ChatBot
         void OnMessageReceived(object sender, OnMessageReceivedArgs args)
         {
             chatMessages.AddMessage(args, chatText);
+            Canvas.ForceUpdateCanvases();
+            chatScrollView.verticalNormalizedPosition = 0f;
         }
         
         void OnChatCommandReceived(object sender, OnChatCommandReceivedArgs args)
         {
-            ChatEventListener.InvokeOnCommandReceived(args.Command.ChatMessage.Username, args.Command.CommandText, args.Command.ArgumentsAsList);
+            ChatEventMediator.InvokeOnCommandReceived(args.Command.ChatMessage.Username, args.Command.CommandText, args.Command.ArgumentsAsList);
         }
 
         void OnError(object sender, OnErrorEventArgs args)
@@ -108,4 +107,3 @@ namespace ChatBot
         }
     }
 }
-

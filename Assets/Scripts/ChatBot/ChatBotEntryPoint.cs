@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ChatBot
 {
-    public class ChatBotPersistent : MonoBehaviour
+    public class ChatBotEntryPoint : MonoBehaviour
     {
         [SerializeField]
         ChatBotConfig config;
@@ -13,10 +13,18 @@ namespace ChatBot
         [SerializeField]
         ChatBotGame chatBotGame;
         
+        [SerializeField]
+        ChatBotApi chatBotApi;
+        
+        [SerializeField]
+        ChatBotView chatBotView;
+        
         void Awake()
         {
             chatBotClient.Init(config);
             chatBotGame.Init();
+            chatBotApi.Init();
+            //chatBotView.Init(chatBotClient, config);
         }
     }
 }
