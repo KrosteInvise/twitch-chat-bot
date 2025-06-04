@@ -1,13 +1,12 @@
+using ChatBotCommands;
 using TMPro;
 using UnityEngine;
 using TwitchLib.Client.Models;
 using TwitchLib.Client.Events;
-using TwitchLib.Client.Extensions;
 using TwitchLib.Communication.Events;
 using TwitchLib.Unity;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
-using Repeat = ChatBotCommands.Repeat;
 
 namespace ChatBot
 {
@@ -53,8 +52,8 @@ namespace ChatBot
             client.OnMessageReceived += OnMessageReceived;
             client.OnChatCommandReceived += OnChatCommandReceived;
             client.OnError += OnError;
-            
             client.Connect();
+            
         }
         
         public void Disconnect()

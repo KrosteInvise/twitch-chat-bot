@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ChatBot;
@@ -6,11 +5,12 @@ using UnityEngine;
 
 namespace ChatBotCommands
 {
-    public class RollDiceGame
+    [CreateAssetMenu(fileName = "ChatBotCommand", menuName = "Commands/ChatBotCommand")]
+    public class RollDiceGame : ChatBotCommand
     {
-        public IEnumerator RollDice(string sender, PlayersDataBase playersData, List<string> args)
+        public override void Execute(string username, List<string> args, PlayersDataBase playersData)
         {
-            PlayerObject player = playersData.PlayersDataList.Find(x => x.twitchName == sender);
+            PlayerObject player = playersData.PlayersDataList.Find(x => x.twitchName == username);
             string stake = args.FirstOrDefault();
             var userRoll = Random.Range(1, 13);
             var botRoll = Random.Range(1, 13);
@@ -18,7 +18,7 @@ namespace ChatBotCommands
             if (!int.TryParse(stake, out int finalStake))
             {
                 ChatEventMediator.InvokeRespond($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ");
-                yield break;
+                return;
             }
 
             if (finalStake <= player.gold)

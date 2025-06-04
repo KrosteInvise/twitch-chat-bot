@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using ChatBot;
 using TMPro;
-using TwitchLib.Client;
 using TwitchLib.Client.Models.Common;
 using UnityEngine;
 

@@ -14,7 +14,7 @@ namespace ChatBot
             string color = args.ChatMessage.ColorHex;
             
             if (color == "")
-                color = "#FFFFFF";
+                color = "#000000";
             
             chatMessages.Add($"<{color}>{args.ChatMessage.Username}</color>: {args.ChatMessage.Message}");
             if (chatMessages.Count > MAX_MESSAGES)
