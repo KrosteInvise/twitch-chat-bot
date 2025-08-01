@@ -25,7 +25,7 @@ namespace ChatBot
         void ProceedCommand(string sender, string command, List<string> args)
         {
             AddPlayer(sender);
-
+            
             foreach (var chatBotCommand in chatBotCommands)
             {
                 if (chatBotCommand.CommandName == command)
