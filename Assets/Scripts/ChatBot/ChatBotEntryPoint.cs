@@ -1,12 +1,10 @@
 using UnityEngine;
+using Zenject;
 
 namespace ChatBot
 {
     public class ChatBotEntryPoint : MonoBehaviour
     {
-        [SerializeField]
-        ChatBotConfig config;
-        
         [SerializeField]
         ChatBotClient chatBotClient;
         
@@ -19,12 +17,24 @@ namespace ChatBot
         [SerializeField]
         ChatBotView chatBotView;
         
+        [SerializeField]
+        ChatBotConfig chatBotConfig;
+        
+        ChatMessages chatMessages = new();
+        SignalBus signalBus;
+
+        [Inject]
+        void Construct(SignalBus signalBus)
+        {
+            this.signalBus = signalBus;
+        }
+        
         void Awake()
         {
-            chatBotClient.Init(config);
-            chatBotGame.Init();
+            chatBotClient.Init(signalBus, chatBotConfig);
+            chatBotGame.Init(signalBus);
             chatBotApi.Init();
-            //chatBotView.Init(chatBotClient, config);
+            chatBotView.Init(signalBus, chatMessages, chatBotClient, chatBotConfig);
         }
     }
 }

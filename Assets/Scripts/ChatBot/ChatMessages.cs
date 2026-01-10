@@ -22,5 +22,10 @@ namespace ChatBot
 
             chatText.text = string.Join("\n", chatMessages);
         }
+
+        public void AddLog(string message, TextMeshProUGUI chatText)
+        {
+            chatText.text = string.Join("\n", message);
+        }
     }
 }

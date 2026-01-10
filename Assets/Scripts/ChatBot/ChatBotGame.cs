@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Signals;
+using Zenject;
 
 namespace ChatBot
 {
@@ -10,11 +12,14 @@ namespace ChatBot
         
         [SerializeField]
         ChatBotCommand[] chatBotCommands;
+
+        SignalBus signalBus;
         
-        public void Init()
+        public void Init(SignalBus signalBus)
         {
+            this.signalBus = signalBus;
             playersData = ChatBotGameData.Load();
-            ChatEventMediator.OnCommandReceived += ProceedCommand;
+            signalBus.Subscribe<ReceiveCommandSignal>(ProceedCommand);
         }
 
         void OnApplicationQuit()
@@ -22,14 +27,22 @@ namespace ChatBot
             ChatBotGameData.Save(playersData);
         }
 
-        void ProceedCommand(string sender, string command, List<string> args)
+        void ProceedCommand(ReceiveCommandSignal signal)
         {
-            AddPlayer(sender);
+            AddPlayer(signal.Sender);
+
+            var context = new CommandContext()
+            {
+                Sender = signal.Sender,
+                Args = signal.Args,
+                PlayersData = playersData,
+                SignalBus = signalBus
+            };
             
             foreach (var chatBotCommand in chatBotCommands)
             {
-                if (chatBotCommand.CommandName == command)
-                    chatBotCommand.Execute(sender, args, playersData);
+                if (chatBotCommand.CommandName == signal.Command)
+                    chatBotCommand.Execute(context);
             }
         }
 

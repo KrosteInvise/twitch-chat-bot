@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace ChatBot
@@ -15,6 +14,6 @@ namespace ChatBot
 
         public float Cooldown => cooldown;
 
-        public abstract void Execute(string username, List<string> args, PlayersDataBase playersData);
+        public abstract void Execute(CommandContext context);
     }
 }

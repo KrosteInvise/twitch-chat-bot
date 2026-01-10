@@ -1,25 +1,47 @@
+using Signals;
 using TMPro;
+using TwitchLib.Client.Events;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace ChatBot
 {
     public class ChatBotView : MonoBehaviour
     {
         [SerializeField]
-        Button connectButton, disconnectButton, repeatButton;
+        Button connectButton, disconnectButton;
         
         [SerializeField]
         TextMeshProUGUI chatText;
         
         [SerializeField]
-        TMP_InputField repeatTextInputField;
+        ScrollRect chatScrollView;
+        
+        ChatMessages chatMessages;
 
-        public void Init(ChatBotClient chatBotClient, ChatBotConfig config)
+        public void Init(SignalBus signalBus, ChatMessages chatMessages, ChatBotClient chatBotClient, ChatBotConfig config)
         {
-            //connectButton.onClick.AddListener(Connect);
-            //disconnectButton.onClick.AddListener(Disconnect);
-            //repeatButton.onClick.AddListener(() => new Repeat().RepeatExecute(chatBotClient, config, repeatTextInputField));
+            this.chatMessages = chatMessages;
+            
+            connectButton.onClick.AddListener(() => chatBotClient.Connect(config));
+            disconnectButton.onClick.AddListener(chatBotClient.Disconnect);
+            signalBus.Subscribe<PrintToChatSignal>(OnPrintToChat);
+            signalBus.Subscribe<LogToChatSignal>(OnLogToChat);
+        }
+
+        void OnLogToChat(LogToChatSignal signal)
+        {
+            chatMessages.AddLog(signal.Message, chatText);
+            chatScrollView.verticalNormalizedPosition = 0f;
+            Canvas.ForceUpdateCanvases();
+        }
+
+        void OnPrintToChat(PrintToChatSignal signal)
+        {
+            chatMessages.AddMessage(signal.Args, chatText);
+            chatScrollView.verticalNormalizedPosition = 0f;
+            Canvas.ForceUpdateCanvases();
         }
     }
 }
