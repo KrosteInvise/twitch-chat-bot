@@ -21,7 +21,7 @@ The project is not intended for production use. It’s a personal sandbox for le
 ---
 
 ## 🛠️ Tech Stack  
-- **Unity** (add your version here)  
+- **Unity 6** (6000.0.61f1)  
 - **C#**  
 - **Twitch IRC / Twitch API**  
 - Optional: **Newtonsoft.Json**, **WebSockets**
