@@ -7,7 +7,7 @@ namespace ChatBot
     public class PlayerObject
     {
         public string twitchName;
-        public float gold;
+        public int gold;
 
         public PlayerObject(string twitchName)
         {

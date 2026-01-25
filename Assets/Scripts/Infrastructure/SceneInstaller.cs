@@ -14,7 +14,7 @@ namespace Infrastructure
         {
             SignalBusInstaller.Install(Container);
             Container.DeclareSignal<LogToChatSignal>();
-            Container.DeclareSignal<PrintToChatSignal>();
+            Container.DeclareSignal<PrintToLocalChatSignal>();
             Container.DeclareSignal<PrintToTwitchChatSignal>();
             Container.DeclareSignal<ReceiveCommandSignal>();
         }

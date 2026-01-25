@@ -12,14 +12,19 @@ namespace ChatBot
         
         [SerializeField]
         ChatBotCommand[] chatBotCommands;
+        
+        Dictionary<string, ChatBotCommand> commandsDictionary = new();
 
         SignalBus signalBus;
         
         public void Init(SignalBus signalBus)
         {
             this.signalBus = signalBus;
-            playersData = ChatBotGameData.Load();
+            //playersData = ChatBotGameData.Load();
             signalBus.Subscribe<ReceiveCommandSignal>(ProceedCommand);
+
+            foreach (var chatBotCommand in chatBotCommands)
+                commandsDictionary.Add(chatBotCommand.CommandName, chatBotCommand);
         }
 
         void OnApplicationQuit()
@@ -39,11 +44,9 @@ namespace ChatBot
                 SignalBus = signalBus
             };
             
-            foreach (var chatBotCommand in chatBotCommands)
-            {
-                if (chatBotCommand.CommandName == signal.Command)
-                    chatBotCommand.Execute(context);
-            }
+            commandsDictionary.TryGetValue(signal.Command, out ChatBotCommand chatBotCommand);
+            if (chatBotCommand != null) 
+                chatBotCommand.Execute(context);
         }
 
         void AddPlayer(string sender)

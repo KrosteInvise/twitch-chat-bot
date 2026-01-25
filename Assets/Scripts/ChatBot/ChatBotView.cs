@@ -1,6 +1,5 @@
 using Signals;
 using TMPro;
-using TwitchLib.Client.Events;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -10,23 +9,38 @@ namespace ChatBot
     public class ChatBotView : MonoBehaviour
     {
         [SerializeField]
-        Button connectButton, disconnectButton;
+        Button connectButton, disconnectButton, clearChatButton, autoHelloButton;
         
         [SerializeField]
         TextMeshProUGUI chatText;
         
         [SerializeField]
         ScrollRect chatScrollView;
+
+        [SerializeField]
+        TMP_InputField channelInputField, botInputField;
         
         ChatMessages chatMessages;
 
-        public void Init(SignalBus signalBus, ChatMessages chatMessages, ChatBotClient chatBotClient, ChatBotConfig config)
+        public void Init(SignalBus signalBus, ChatMessages chatMessages, ChatBotClient chatBotClient)
         {
             this.chatMessages = chatMessages;
             
-            connectButton.onClick.AddListener(() => chatBotClient.Connect(config));
+            connectButton.onClick.AddListener(() => chatBotClient.Connect(channelInputField.text, botInputField.text));
             disconnectButton.onClick.AddListener(chatBotClient.Disconnect);
-            signalBus.Subscribe<PrintToChatSignal>(OnPrintToChat);
+            clearChatButton.onClick.AddListener(() =>
+            {
+                chatText.text = "";
+                chatMessages.ClearMessages();
+            });
+            
+            autoHelloButton.onClick.AddListener(() =>
+            {
+                new AutoHelloResponse().AutoHello(chatBotClient.LastUserPinged, signalBus);
+                chatBotClient.LastUserPinged = "";
+            });
+            
+            signalBus.Subscribe<PrintToLocalChatSignal>(OnPrintToChat);
             signalBus.Subscribe<LogToChatSignal>(OnLogToChat);
         }
 
@@ -34,14 +48,12 @@ namespace ChatBot
         {
             chatMessages.AddLog(signal.Message, chatText);
             chatScrollView.verticalNormalizedPosition = 0f;
-            Canvas.ForceUpdateCanvases();
         }
 
-        void OnPrintToChat(PrintToChatSignal signal)
+        void OnPrintToChat(PrintToLocalChatSignal signal)
         {
             chatMessages.AddMessage(signal.Args, chatText);
             chatScrollView.verticalNormalizedPosition = 0f;
-            Canvas.ForceUpdateCanvases();
         }
     }
 }

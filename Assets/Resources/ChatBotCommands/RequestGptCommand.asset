@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a620d03d76eba134493dd537cded87dc, type: 3}
-  m_Name: RollDiceCommand
+  m_Script: {fileID: 11500000, guid: 4d5a0ac8dc043a849b69c0c190652794, type: 3}
+  m_Name: RequestGptCommand
   m_EditorClassIdentifier: 
-  commandName: gamba
+  commandName: krotgpt
   cooldown: 0

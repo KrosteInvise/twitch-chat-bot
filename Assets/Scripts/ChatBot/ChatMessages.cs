@@ -25,7 +25,17 @@ namespace ChatBot
 
         public void AddLog(string message, TextMeshProUGUI chatText)
         {
-            chatText.text = string.Join("\n", message);
+            chatMessages.Add($"<#ff0000>{message}</color>");
+            
+            if (chatMessages.Count > MAX_MESSAGES)
+                chatMessages.RemoveAt(0);
+            
+            chatText.text = string.Join("\n", chatMessages);
+        }
+
+        public void ClearMessages()
+        {
+            chatMessages.Clear();
         }
     }
 }

@@ -21,6 +21,12 @@ namespace ChatBotCommands
                 return;
             }
 
+            if (finalStake == 0)
+            {
+                context.SignalBus.Fire(new PrintToTwitchChatSignal($"{player.twitchName}, ха-ха, какой ты смешной veselo"));
+                return;
+            }
+
             if (finalStake <= player.gold)
             {
                 player.gold -= finalStake;
@@ -42,7 +48,7 @@ namespace ChatBotCommands
             }
             else
             {
-                context.SignalBus.Fire(new PrintToTwitchChatSignal($"{player.twitchName}, не хватает деняк (!money)"));
+                context.SignalBus.Fire(new PrintToTwitchChatSignal($"{player.twitchName}, не хватает деняк (!cash)"));
             }
         }
     }

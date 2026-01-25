@@ -2,7 +2,7 @@ namespace Signals
 {
     public struct PrintToTwitchChatSignal
     {
-        public string Message { get; set; }
+        public string Message { get; }
 
         public PrintToTwitchChatSignal(string message)
         {

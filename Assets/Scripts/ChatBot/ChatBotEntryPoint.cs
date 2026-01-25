@@ -17,9 +17,6 @@ namespace ChatBot
         [SerializeField]
         ChatBotView chatBotView;
         
-        [SerializeField]
-        ChatBotConfig chatBotConfig;
-        
         ChatMessages chatMessages = new();
         SignalBus signalBus;
 
@@ -31,10 +28,10 @@ namespace ChatBot
         
         void Awake()
         {
-            chatBotClient.Init(signalBus, chatBotConfig);
+            chatBotClient.Init(signalBus);
             chatBotGame.Init(signalBus);
             chatBotApi.Init();
-            chatBotView.Init(signalBus, chatMessages, chatBotClient, chatBotConfig);
+            chatBotView.Init(signalBus, chatMessages, chatBotClient);
         }
     }
 }
