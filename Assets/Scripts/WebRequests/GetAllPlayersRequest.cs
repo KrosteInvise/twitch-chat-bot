@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using ChatBot;
+using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -5,20 +9,22 @@ namespace WebRequests
 {
     public class GetAllPlayersRequest
     {
-        public async void GetAllRequestAsync(string url)
+        public async UniTask<List<PlayerObject>> GetAllRequestAsync(string url)
         {
-            var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbGET);
-            await request.SendWebRequest();
-            
+            var request = UnityWebRequest.Get(url);
+            var operation = request.SendWebRequest();
+
+            while (!operation.isDone)
+                await UniTask.Yield();
+
             if (request.result == UnityWebRequest.Result.Success)
             {
-                var a = request.downloadHandler.text;
-                Debug.Log(a);
+                string json = request.downloadHandler.text;
+                return JsonConvert.DeserializeObject<List<PlayerObject>>(json);
             }
-            else
-            {
-                Debug.Log("Error: " + request.error);
-            }
+
+            Debug.LogError($"Error: {request.error}");
+            return null;
         }
     }
 }

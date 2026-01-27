@@ -17,24 +17,19 @@ namespace ChatBot
 
         SignalBus signalBus;
         
-        public void Init(SignalBus signalBus)
+        public async void InitAsync(SignalBus signalBus)
         {
             this.signalBus = signalBus;
-            //playersData = ChatBotGameData.Load();
+            playersData = await ChatBotGameData.LoadAsync();
             signalBus.Subscribe<ReceiveCommandSignal>(ProceedCommand);
 
             foreach (var chatBotCommand in chatBotCommands)
                 commandsDictionary.Add(chatBotCommand.CommandName, chatBotCommand);
         }
 
-        void OnApplicationQuit()
-        {
-            ChatBotGameData.Save(playersData);
-        }
-
         void ProceedCommand(ReceiveCommandSignal signal)
         {
-            AddPlayer(signal.Sender);
+            //AddPlayer(signal.Sender);
 
             var context = new CommandContext()
             {
@@ -56,7 +51,7 @@ namespace ChatBot
             if (!playersData.PlayersDataList.Exists(x => x.twitchName == player.twitchName))
                 playersData.PlayersDataList.Add(player);
 
-            ChatBotGameData.Save(playersData);
+            
         }
     }
 }

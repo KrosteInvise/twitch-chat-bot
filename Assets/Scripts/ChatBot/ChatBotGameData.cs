@@ -1,30 +1,22 @@
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using WebRequests;
+
 namespace ChatBot
 {
     public static class ChatBotGameData
     {
-        
-        /*public static PlayersDataBase Load()
+        public static async UniTask<PlayersDataBase> LoadAsync()
         {
+            string url = "http://localhost:8080/api/players";
             var request = new GetAllPlayersRequest();
             
-            request.GetAllRequestAsync();
+            List<PlayerObject> players = await request.GetAllRequestAsync(url);
             
-            return JsonConvert.DeserializeObject<PlayersDataBase>();
+            PlayersDataBase dataBase = new PlayersDataBase();
+            dataBase.PlayersDataList = players;
             
-            if (!File.Exists(fullPath))
-            {
-                Debug.LogError("Data file doesn't exist! Creating new save file!");
-                File.Create(fullPath);
-                return new PlayersDataBase();
-            }
-            
-            PlayersDataBase playersData = JsonUtility.FromJson<PlayersDataBase>(File.ReadAllText(fullPath));
-            return playersData;
-        }*/
-    
-        public static void Save(PlayersDataBase playersData)
-        {
-            //File.WriteAllText(fullPath,JsonUtility.ToJson(playersData, true)); 
+            return dataBase;
         }
     }
 }

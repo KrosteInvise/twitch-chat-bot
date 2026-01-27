@@ -10,6 +10,11 @@ namespace ChatBotCommands
         public override void Execute(CommandContext context)
         {
             PlayerObject player = context.PlayersData.PlayersDataList.Find(x => x.twitchName == context.Sender);
+            if (player == null)
+            {
+                context.SignalBus.Fire(new PrintToTwitchChatSignal("Игрок с таким никнеймом не найден! Зарегаться !create"));
+                return;
+            }
             context.SignalBus.Fire(new PrintToTwitchChatSignal($"{player.twitchName}, у вас {player.gold} деняк baseg"));
         }
     }

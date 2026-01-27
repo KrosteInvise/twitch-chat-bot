@@ -10,7 +10,7 @@ namespace ChatBot
             if(string.IsNullOrEmpty(lastUserPinged))
                 return;
             
-            signalBus.Fire(new PrintToTwitchChatSignal($"@{lastUserPinged}, peepoSitHey"));
+            signalBus.Fire(new PrintToTwitchChatSignal($"@{lastUserPinged} peepoSitHey"));
         }
     }
 }

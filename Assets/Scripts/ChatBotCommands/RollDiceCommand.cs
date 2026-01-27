@@ -11,19 +11,24 @@ namespace ChatBotCommands
         public override void Execute(CommandContext context)
         {
             PlayerObject player = context.PlayersData.PlayersDataList.Find(x => x.twitchName == context.Sender);
+            if (player == null)
+            {
+                context.SignalBus.Fire(new PrintToTwitchChatSignal("Игрок с таким никнеймом не найден! Зарегаться !create"));
+                return;
+            }
             string stake = context.Args.FirstOrDefault();
             var userRoll = Random.Range(1, 13);
             var botRoll = Random.Range(1, 13);
 
             if (!int.TryParse(stake, out int finalStake))
             {
-                context.SignalBus.Fire(new PrintToTwitchChatSignal($"{player.twitchName}, чел... Пиши !dice и ставку через пробел EZ"));
+                context.SignalBus.Fire(new PrintToTwitchChatSignal($"{context.Sender} чел... Пиши !dice и ставку через пробел EZ"));
                 return;
             }
 
             if (finalStake == 0)
             {
-                context.SignalBus.Fire(new PrintToTwitchChatSignal($"{player.twitchName}, ха-ха, какой ты смешной veselo"));
+                context.SignalBus.Fire(new PrintToTwitchChatSignal($"{context.Sender} ха-ха, какой ты смешной veselo"));
                 return;
             }
 
@@ -33,22 +38,22 @@ namespace ChatBotCommands
 
                 if (userRoll > botRoll)
                 {
-                    context.SignalBus.Fire(new PrintToTwitchChatSignal($"baseg : {botRoll}. {player.twitchName}: {userRoll}. Поздравляю EZ"));
+                    context.SignalBus.Fire(new PrintToTwitchChatSignal($"baseg : {botRoll}. {context.Sender}: {userRoll}. Поздравляю EZ"));
                     player.gold += finalStake * 2;
                 }
                 else if (userRoll == botRoll)
                 {
-                    context.SignalBus.Fire(new PrintToTwitchChatSignal($"baseg : {botRoll}. {player.twitchName}: {userRoll}. Да клянись, ничья!"));
+                    context.SignalBus.Fire(new PrintToTwitchChatSignal($"baseg : {botRoll}. {context.Sender}: {userRoll}. Да клянись, ничья!"));
                     player.gold += finalStake;
                 }
                 else
                 {
-                    context.SignalBus.Fire(new PrintToTwitchChatSignal($"baseg : {botRoll}. {player.twitchName}: {userRoll}. baseg побеждает YviBusiness"));
+                    context.SignalBus.Fire(new PrintToTwitchChatSignal($"baseg : {botRoll}. {context.Sender}: {userRoll}. baseg побеждает YviBusiness"));
                 }
             }
             else
             {
-                context.SignalBus.Fire(new PrintToTwitchChatSignal($"{player.twitchName}, не хватает деняк (!cash)"));
+                context.SignalBus.Fire(new PrintToTwitchChatSignal($"{context.Sender}, не хватает деняк (!cash)"));
             }
         }
     }
