@@ -7,7 +7,6 @@ namespace ChatBot
     {
         public string Sender { get; set; }
         public List<string> Args { get; set; }
-        public PlayersDataBase PlayersData { get; set; }
         public SignalBus SignalBus { get; set; }
     }
 }

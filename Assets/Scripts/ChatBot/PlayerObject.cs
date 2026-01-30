@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace ChatBot
 {
@@ -14,11 +13,5 @@ namespace ChatBot
             this.twitchName = twitchName;
             gold = 100;
         }
-    }
-
-    [Serializable]
-    public class PlayersDataBase
-    {
-        public List<PlayerObject> PlayersDataList;
     }
 }

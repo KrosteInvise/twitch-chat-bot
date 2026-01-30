@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using ChatBot;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
@@ -7,11 +6,11 @@ using UnityEngine.Networking;
 
 namespace WebRequests
 {
-    public class GetAllPlayersRequest
+    public class GetByTwitchNameRequest
     {
-        public async UniTask<List<PlayerObject>> Send()
+        public async UniTask<PlayerObject> GetPlayerByTwitchName(string twitchName)
         {
-            var url = "http://localhost:8080/api/players";
+            var url = $"http://localhost:8080/api/players/by-name/{twitchName}";
             var request = UnityWebRequest.Get(url);
             var operation = request.SendWebRequest();
 
@@ -21,7 +20,7 @@ namespace WebRequests
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string json = request.downloadHandler.text;
-                return JsonConvert.DeserializeObject<List<PlayerObject>>(json);
+                return JsonConvert.DeserializeObject<PlayerObject>(json);
             }
 
             Debug.LogError($"Error: {request.error}");

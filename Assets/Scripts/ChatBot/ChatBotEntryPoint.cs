@@ -29,7 +29,7 @@ namespace ChatBot
         void Awake()
         {
             chatBotClient.Init(signalBus);
-            chatBotGame.InitAsync(signalBus);
+            chatBotGame.Init(signalBus);
             chatBotApi.Init();
             chatBotView.Init(signalBus, chatMessages, chatBotClient);
         }

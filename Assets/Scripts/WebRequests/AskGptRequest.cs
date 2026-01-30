@@ -3,12 +3,13 @@ using Signals;
 using UnityEngine;
 using UnityEngine.Networking;
 using Zenject;
+using UniTask = Cysharp.Threading.Tasks.UniTask;
 
 namespace WebRequests
 {
     public class AskGptRequest
     {
-        public async void GetGptResponse(string userName, string question, SignalBus signalBus)
+        public async UniTask GetGptResponse(string userName, string question, SignalBus signalBus)
         {
             string apiKey = Secrets.gpt_api_key;
             string url = "https://api.openai.com/v1/chat/completions";
@@ -43,17 +44,10 @@ namespace WebRequests
             {
                 var response = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(request.downloadHandler.text);
                 string aiAnswer = response.choices[0].message.content;
-                foreach (var choice in response.choices)
-                {
-                    Debug.Log($"{choice.ToString()}");
-                }
-                
                 signalBus.Fire(new PrintToTwitchChatSignal($"@{userName}, {aiAnswer}"));
             }
-            else
-            {
-                Debug.Log("Error: " + request.error);
-            }
+            
+            Debug.LogError("Error: " + request.error);
         }
     }
 }

@@ -1,19 +1,15 @@
-using System.Linq;
-using System.Text;
 using ChatBot;
-using NaughtyAttributes;
+using Cysharp.Threading.Tasks;
 using Signals;
 using UnityEngine;
-using UnityEngine.Networking;
 using WebRequests;
-using Zenject;
 
 namespace ChatBotCommands
 {
     [CreateAssetMenu(fileName = "RequestGptCommand", menuName = "Commands/RequestGptCommand")]
     public class RequestGptCommand : ChatBotCommand
     {
-        public override void Execute(CommandContext context)
+        public override async UniTask Execute(CommandContext context)
         { 
             string question = string.Join(" ", context.Args);
             if (string.IsNullOrEmpty(question))
@@ -23,7 +19,7 @@ namespace ChatBotCommands
             }
 
             var request = new AskGptRequest(); 
-            request.GetGptResponse(context.Sender, question, context.SignalBus);
+            await request.GetGptResponse(context.Sender, question, context.SignalBus);
         }
     }
 }

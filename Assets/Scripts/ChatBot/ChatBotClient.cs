@@ -91,7 +91,7 @@ namespace ChatBot
         void OnMessageReceived(object sender, OnMessageReceivedArgs args)
         {
             OnBeingPinged(args.ChatMessage.Username, args.ChatMessage.Message);
-            signalBus.Fire(new PrintToLocalChatSignal(args));
+            signalBus.Fire(new PrintToLocalChatSignal(args)); //не передавать args
         }
         
         void OnChatCommandReceived(object sender, OnChatCommandReceivedArgs args)
