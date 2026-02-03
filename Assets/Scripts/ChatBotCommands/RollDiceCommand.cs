@@ -38,7 +38,7 @@ namespace ChatBotCommands
                 if (userRoll > botRoll)
                 {
                     context.SignalBus.Fire(new PrintToTwitchChatSignal($"@{context.Sender}: {userRoll}. baseg : {botRoll}. Поздравляю EZ Clap"));
-                    await request.ModifyGold(Player.twitchName, finalStake * 2);
+                    await request.ModifyGold(Player.twitchName, finalStake);
                 }
                 else if (userRoll == botRoll)
                 {
