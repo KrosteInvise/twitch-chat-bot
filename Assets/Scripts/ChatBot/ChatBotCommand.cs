@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using DTO;
 using Signals;
 using UnityEngine;
 using WebRequests;
@@ -23,7 +24,7 @@ namespace ChatBot
         public virtual async UniTask Execute(CommandContext context)
         {
             var getPlayerRequest = new GetByTwitchNameRequest();
-            Player = await getPlayerRequest.GetPlayerByTwitchName(context.Sender);
+            Player = await getPlayerRequest.SendGetPlayerByTwitchName(context.Sender);
 
             if (Player == null || String.IsNullOrEmpty(Player.twitchName))
                 context.SignalBus.Fire(new PrintToTwitchChatSignal($"@{context.Sender} Игрок с таким ником не найден! Зарегаться !create"));

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChatBot
+namespace DTO
 {
     [Serializable]
     public class PlayerObject

@@ -13,12 +13,12 @@ namespace ChatBotCommands
         public override async UniTask Execute(CommandContext context)
         {
             var getPlayerRequest = new GetByTwitchNameRequest();
-            Player = await getPlayerRequest.GetPlayerByTwitchName(context.Sender);
+            Player = await getPlayerRequest.SendGetPlayerByTwitchName(context.Sender);
             
             if (Player == null)
             {
                 var createRequest = new CreatePlayerRequest();
-                await createRequest.CreatePlayerRequestAsync(context.Sender);
+                await createRequest.SendCreatePlayerRequest(context.Sender);
                 context.SignalBus.Fire(new PrintToTwitchChatSignal($"@{context.Sender} успешно создан!"));
             }
             else

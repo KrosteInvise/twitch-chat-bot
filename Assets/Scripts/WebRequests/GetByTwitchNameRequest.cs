@@ -1,5 +1,5 @@
-using ChatBot;
 using Cysharp.Threading.Tasks;
+using DTO;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -8,7 +8,7 @@ namespace WebRequests
 {
     public class GetByTwitchNameRequest
     {
-        public async UniTask<PlayerObject> GetPlayerByTwitchName(string twitchName)
+        public async UniTask<PlayerObject> SendGetPlayerByTwitchName(string twitchName)
         {
             var url = $"http://localhost:8080/api/players/by-name/{twitchName}";
             var request = UnityWebRequest.Get(url);

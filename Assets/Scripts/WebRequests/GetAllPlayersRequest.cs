@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using ChatBot;
 using Cysharp.Threading.Tasks;
+using DTO;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -9,7 +9,7 @@ namespace WebRequests
 {
     public class GetAllPlayersRequest
     {
-        public async UniTask<List<PlayerObject>> Send()
+        public async UniTask<List<PlayerObject>> SendGetAllPlayers()
         {
             var url = "http://localhost:8080/api/players";
             var request = UnityWebRequest.Get(url);
@@ -25,7 +25,7 @@ namespace WebRequests
             }
 
             Debug.LogError($"Error: {request.error}");
-            return null;
+            return new List<PlayerObject>();
         }
     }
 }
