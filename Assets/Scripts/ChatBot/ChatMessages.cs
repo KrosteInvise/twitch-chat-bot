@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using TMPro;
-using TwitchLib.Client.Events;
 
 namespace ChatBot
 {
@@ -8,15 +7,12 @@ namespace ChatBot
     {
         List<string> chatMessages = new();
         const int MAX_MESSAGES = 150;
-        
-        public void AddMessage(OnMessageReceivedArgs args, TextMeshProUGUI chatText)
+
+        public void AddMessage(string username, string colorHex, string message, TextMeshProUGUI chatText)
         {
-            string color = args.ChatMessage.ColorHex;
-            
-            if (color == "")
-                color = "#000000";
-            
-            chatMessages.Add($"<{color}>{args.ChatMessage.Username}</color>: {args.ChatMessage.Message}");
+            string color = string.IsNullOrEmpty(colorHex) ? "#000000" : colorHex;
+
+            chatMessages.Add($"<{color}>{username}</color>: {message}");
             if (chatMessages.Count > MAX_MESSAGES)
                 chatMessages.RemoveAt(0);
 
@@ -26,10 +22,10 @@ namespace ChatBot
         public void AddLog(string message, TextMeshProUGUI chatText)
         {
             chatMessages.Add($"<#ff0000>{message}</color>");
-            
+
             if (chatMessages.Count > MAX_MESSAGES)
                 chatMessages.RemoveAt(0);
-            
+
             chatText.text = string.Join("\n", chatMessages);
         }
 

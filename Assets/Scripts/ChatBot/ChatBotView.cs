@@ -1,8 +1,8 @@
+using System;
 using Signals;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Zenject;
 
 namespace ChatBot
 {
@@ -10,49 +10,44 @@ namespace ChatBot
     {
         [SerializeField]
         Button connectButton, disconnectButton, clearChatButton, autoHelloButton;
-        
+
         [SerializeField]
         TextMeshProUGUI chatText;
-        
+
         [SerializeField]
         ScrollRect chatScrollView;
 
         [SerializeField]
         TMP_InputField channelInputField, botInputField;
-        
-        ChatMessages chatMessages;
 
-        public void Init(SignalBus signalBus, ChatMessages chatMessages, ChatBotClient chatBotClient)
+        readonly ChatMessages chatMessages = new();
+
+        public event Action<string, string> ConnectClicked;
+        public event Action DisconnectClicked;
+        public event Action AutoHelloClicked;
+
+        void Awake()
         {
-            this.chatMessages = chatMessages;
-            
-            connectButton.onClick.AddListener(() => chatBotClient.Connect(channelInputField.text, botInputField.text));
-            disconnectButton.onClick.AddListener(chatBotClient.Disconnect);
+            connectButton.onClick.AddListener(() =>
+                ConnectClicked?.Invoke(channelInputField.text, botInputField.text));
+            disconnectButton.onClick.AddListener(() => DisconnectClicked?.Invoke());
+            autoHelloButton.onClick.AddListener(() => AutoHelloClicked?.Invoke());
             clearChatButton.onClick.AddListener(() =>
             {
                 chatText.text = "";
                 chatMessages.ClearMessages();
             });
-            
-            autoHelloButton.onClick.AddListener(() =>
-            {
-                new AutoHelloResponse().AutoHello(chatBotClient.LastUserPinged, signalBus);
-                chatBotClient.LastUserPinged = "";
-            });
-            
-            signalBus.Subscribe<PrintToLocalChatSignal>(OnPrintToChat);
-            signalBus.Subscribe<LogToChatSignal>(OnLogToChat);
         }
 
-        void OnLogToChat(LogToChatSignal signal)
+        public void OnLogToChat(LogToChatSignal signal)
         {
             chatMessages.AddLog(signal.Message, chatText);
             chatScrollView.verticalNormalizedPosition = 0f;
         }
 
-        void OnPrintToChat(PrintToLocalChatSignal signal)
+        public void OnPrintToChat(PrintToLocalChatSignal signal)
         {
-            chatMessages.AddMessage(signal.Args, chatText);
+            chatMessages.AddMessage(signal.Username, signal.ColorHex, signal.Message, chatText);
             chatScrollView.verticalNormalizedPosition = 0f;
         }
     }

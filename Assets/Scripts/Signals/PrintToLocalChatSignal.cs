@@ -1,14 +1,16 @@
-using TwitchLib.Client.Events;
-
 namespace Signals
 {
     public struct PrintToLocalChatSignal
     {
-        public OnMessageReceivedArgs Args { get; }
+        public string Username { get; }
+        public string ColorHex { get; }
+        public string Message { get; }
 
-        public PrintToLocalChatSignal(OnMessageReceivedArgs args)
+        public PrintToLocalChatSignal(string username, string colorHex, string message)
         {
-            Args = args;
+            Username = username;
+            ColorHex = colorHex;
+            Message = message;
         }
     }
 }

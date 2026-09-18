@@ -7,12 +7,13 @@ namespace ChatBotCommands
     [CreateAssetMenu(fileName = "FishingCommand", menuName = "Commands/FishingCommand")]
     public class FishingCommand : ChatBotCommand
     {
-        public override async UniTask Execute(CommandContext context)
+        public override async UniTask<string> Execute(CommandContext context)
         {
-            await base.Execute(context);
-            if(Player == null)
-                return;
+            var player = await TryGetPlayer(context.Sender);
+            if (player == null)
+                return PlayerNotFound(context.Sender);
+
+            return null;
         }
     }
 }
-

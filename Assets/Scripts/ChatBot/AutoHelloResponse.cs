@@ -1,16 +1,13 @@
-using Signals;
-using Zenject;
-
 namespace ChatBot
 {
-    public class AutoHelloResponse 
+    public class AutoHelloResponse
     {
-        public void AutoHello(string lastUserPinged, SignalBus signalBus)
+        public string GetHello(string lastUserPinged)
         {
-            if(string.IsNullOrEmpty(lastUserPinged))
-                return;
-            
-            signalBus.Fire(new PrintToTwitchChatSignal($"@{lastUserPinged} peepoSitHey"));
+            if (string.IsNullOrEmpty(lastUserPinged))
+                return null;
+
+            return $"@{lastUserPinged} peepoSitHey";
         }
     }
 }

@@ -1,7 +1,5 @@
-using System;
 using Cysharp.Threading.Tasks;
 using DTO;
-using Signals;
 using UnityEngine;
 using WebRequests;
 
@@ -15,19 +13,22 @@ namespace ChatBot
         [SerializeField]
         float cooldown;
 
-        protected PlayerObject Player;
-
         public string CommandName => commandName.ToLower();
 
         public float Cooldown => cooldown;
-        
-        public virtual async UniTask Execute(CommandContext context)
-        {
-            var getPlayerRequest = new GetByTwitchNameRequest();
-            Player = await getPlayerRequest.SendGetPlayerByTwitchName(context.Sender);
 
-            if (Player == null || String.IsNullOrEmpty(Player.twitchName))
-                context.SignalBus.Fire(new PrintToTwitchChatSignal($"@{context.Sender} Игрок с таким ником не найден! Зарегаться !create"));
+        public abstract UniTask<string> Execute(CommandContext context);
+
+        protected async UniTask<PlayerObject> TryGetPlayer(string twitchName)
+        {
+            var player = await new GetByTwitchNameRequest().SendGetPlayerByTwitchName(twitchName);
+            if (player == null || string.IsNullOrEmpty(player.twitchName))
+                return null;
+
+            return player;
         }
+
+        protected static string PlayerNotFound(string sender) =>
+            $"@{sender} Игрок с таким ником не найден! Зарегаться !create";
     }
 }

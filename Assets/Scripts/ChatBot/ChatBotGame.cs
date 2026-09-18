@@ -1,6 +1,6 @@
-using UnityEngine;
 using System.Collections.Generic;
 using Signals;
+using UnityEngine;
 using Zenject;
 
 namespace ChatBot
@@ -9,32 +9,54 @@ namespace ChatBot
     {
         [SerializeField]
         ChatBotCommand[] chatBotCommands;
-        
-        Dictionary<string, ChatBotCommand> commandsDictionary = new();
+
+        readonly Dictionary<string, ChatBotCommand> commandsDictionary = new();
+        readonly Dictionary<string, float> lastUsedByPlayerAndCommand = new();
 
         SignalBus signalBus;
-        
-        public void Init(SignalBus signalBus)
+
+        [Inject]
+        void Construct(SignalBus signalBus)
         {
             this.signalBus = signalBus;
-            signalBus.Subscribe<ReceiveCommandSignal>(ProceedCommand);
-
-            foreach (var chatBotCommand in chatBotCommands)
-                commandsDictionary.Add(chatBotCommand.CommandName, chatBotCommand);
         }
 
-        void ProceedCommand(ReceiveCommandSignal signal)
+        void Awake()
         {
-            var context = new CommandContext()
+            foreach (var chatBotCommand in chatBotCommands)
+            {
+                if (chatBotCommand == null)
+                    continue;
+
+                commandsDictionary[chatBotCommand.CommandName] = chatBotCommand;
+            }
+        }
+
+        public async void ProceedCommand(ReceiveCommandSignal signal)
+        {
+            string commandKey = signal.Command?.ToLowerInvariant();
+            if (string.IsNullOrEmpty(commandKey) ||
+                !commandsDictionary.TryGetValue(commandKey, out ChatBotCommand chatBotCommand) ||
+                chatBotCommand == null)
+                return;
+
+            string cooldownKey = $"{signal.Sender}:{commandKey}";
+            if (chatBotCommand.Cooldown > 0f &&
+                lastUsedByPlayerAndCommand.TryGetValue(cooldownKey, out float lastUsed) &&
+                Time.time < lastUsed + chatBotCommand.Cooldown)
+                return;
+
+            lastUsedByPlayerAndCommand[cooldownKey] = Time.time;
+
+            var context = new CommandContext
             {
                 Sender = signal.Sender,
-                Args = signal.Args,
-                SignalBus = signalBus
+                Args = signal.Args
             };
-            
-            commandsDictionary.TryGetValue(signal.Command, out ChatBotCommand chatBotCommand);
-            if (chatBotCommand != null) 
-                _ = chatBotCommand.Execute(context);
+
+            string message = await chatBotCommand.Execute(context);
+            if (!string.IsNullOrEmpty(message))
+                signalBus.Fire(new PrintToTwitchChatSignal(message));
         }
     }
 }

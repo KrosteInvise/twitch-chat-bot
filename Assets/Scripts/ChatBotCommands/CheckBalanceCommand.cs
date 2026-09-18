@@ -1,6 +1,5 @@
 using ChatBot;
 using Cysharp.Threading.Tasks;
-using Signals;
 using UnityEngine;
 
 namespace ChatBotCommands
@@ -8,12 +7,13 @@ namespace ChatBotCommands
     [CreateAssetMenu(fileName = "CheckBalanceCommand", menuName = "Commands/CheckBalanceCommand")]
     public class CheckBalanceCommand : ChatBotCommand
     {
-        public override async UniTask Execute(CommandContext context)
+        public override async UniTask<string> Execute(CommandContext context)
         {
-            await base.Execute(context);
-            if(Player == null)
-                return;
-            context.SignalBus.Fire(new PrintToTwitchChatSignal($"@{context.Sender} у вас {Player.gold} деняк veselo"));
+            var player = await TryGetPlayer(context.Sender);
+            if (player == null)
+                return PlayerNotFound(context.Sender);
+
+            return $"@{context.Sender} у вас {player.gold} деняк veselo";
         }
-    } 
+    }
 }

@@ -1,7 +1,5 @@
-using System;
 using ChatBot;
 using Cysharp.Threading.Tasks;
-using Signals;
 using UnityEngine;
 using WebRequests;
 
@@ -10,19 +8,17 @@ namespace ChatBotCommands
     [CreateAssetMenu(fileName = "CreatePlayerCommand", menuName = "Commands/CreatePlayerCommand")]
     public class CreatePlayerCommand : ChatBotCommand
     {
-        public override async UniTask Execute(CommandContext context)
+        public override async UniTask<string> Execute(CommandContext context)
         {
-            var getPlayerRequest = new GetByTwitchNameRequest();
-            Player = await getPlayerRequest.SendGetPlayerByTwitchName(context.Sender);
-            
-            if (Player == null)
+            var player = await TryGetPlayer(context.Sender);
+
+            if (player == null)
             {
-                var createRequest = new CreatePlayerRequest();
-                await createRequest.SendCreatePlayerRequest(context.Sender);
-                context.SignalBus.Fire(new PrintToTwitchChatSignal($"@{context.Sender} успешно создан!"));
+                await new CreatePlayerRequest().SendCreatePlayerRequest(context.Sender);
+                return $"@{context.Sender} успешно создан!";
             }
-            else
-                context.SignalBus.Fire(new PrintToTwitchChatSignal($"@{context.Sender} уже создан Em"));
+
+            return $"@{context.Sender} уже создан Em";
         }
     }
 }
